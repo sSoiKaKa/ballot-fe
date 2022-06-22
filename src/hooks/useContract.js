@@ -11,6 +11,7 @@ export function useContract() {
 
   // DEV ONLY
   window.Ballot = BallotContract;
+  window.ethers = ethers;
 
   return BallotContract;
 }
