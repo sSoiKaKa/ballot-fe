@@ -3,9 +3,9 @@ import { useEffect } from "react";
 import Swal from "sweetalert2";
 import { useContract } from "../useContract";
 
-export default function useVote() {
+export default function useDelegate() {
   const Ballot = useContract();
-  const fn = useContractFunction(Ballot, "vote", { transactionName: "Vote" });
+  const fn = useContractFunction(Ballot, "delegate", { transactionName: "Delegate" });
 
   useEffect(() => {
     console.log(fn.state);

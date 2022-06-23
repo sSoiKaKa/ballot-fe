@@ -8,6 +8,7 @@ import PlusCircle from "../components/icons/PlusCircle";
 import useLastSessionId from "../hooks/read/useLastSessionId";
 import useCreateSession from "../hooks/transaction/useCreateSession";
 import { useContract } from "../hooks/useContract";
+import { putSession } from "../services/store";
 
 export default function FindBallotSession() {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ export default function FindBallotSession() {
   };
 
   const [sessionInfo, setSessionInfo] = useState({
+    name: "",
     chairperson: "",
     startTime: new Date(),
     endTime: new Date(),
@@ -58,7 +60,16 @@ export default function FindBallotSession() {
       ethers.BigNumber.from(sessionInfo.endTime.getTime())
     );
 
-    console.log(transactionReceipt);
+    const lastSessionId = await Ballot.functions.lastSessionId();
+    if (transactionReceipt) {
+      await putSession(lastSessionId, sessionInfo);
+      setSessionInfo({
+        name: "",
+        chairperson: "",
+        startTime: new Date(),
+        endTime: new Date(),
+      });
+    }
   };
 
   return (
@@ -73,6 +84,20 @@ export default function FindBallotSession() {
 
         <div className="row justify-content-center align-items-center mt-4">
           <div className="col-auto">
+            <input
+              type="text"
+              className="form-control"
+              onChange={(event) =>
+                setSessionInfo({
+                  ...sessionInfo,
+                  name: event.target.value,
+                })
+              }
+              value={sessionInfo.name}
+              placeholder="Cuộc bầu cử ABC"
+            />
+            <div className="form-text mb-3">Tên cuộc bầu cử.</div>
+
             <input
               type="text"
               className="form-control"
