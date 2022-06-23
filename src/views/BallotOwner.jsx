@@ -64,7 +64,7 @@ export default function BallotOwner() {
             <div className="row justify-content-center align-items-center">
               <div className="col-auto">
                 <h2 className="text-secondary text-center">Thêm ứng cử viên</h2>
-                <div className="text-secondary text-center">...Đã có {candidatesFromSession?.value[0].length - 1} ứng cử viên trong cuộc bầu cử này...</div>
+                <div className="text-secondary text-center">...Đã có {candidatesFromSession?.value[0].length} ứng cử viên trong cuộc bầu cử này...</div>
               </div>
             </div>
 

@@ -27,6 +27,8 @@ export default function BallotVoter() {
     const id = ethers.BigNumber.from(state.id);
     (async () => {
       const sessionInfo = (await getSession(id.toString())).data;
+      sessionInfo.startTime = new Date(sessionInfo.startTime);
+      sessionInfo.endTime = new Date(sessionInfo.endTime);
       setSessionInfo(sessionInfo);
     })();
   }, []);
@@ -69,12 +71,20 @@ export default function BallotVoter() {
     await delegate.send(ethers.BigNumber.from(state.id), delegateAddress);
   };
 
+  const isOnTime = sessionInfo.startTime <= new Date() && sessionInfo.startTime >= new Date();
+
   return (
     <div className="vh-100 row justify-content-center align-items-center">
       <div className="col-12">
-        <div className="row justify-content-center align-items-center"></div>
-
         <div className="row justify-content-center align-items-center">
+          <div className="col-auto">
+            <h2>{sessionInfo.name}</h2>
+            <div className="text-center text-secondary">{`Thời gian bắt đầu: ${sessionInfo.startTime.toLocaleDateString()}, ${sessionInfo.startTime.toLocaleTimeString()}`}</div>
+            <div className="text-center text-secondary">{`Thời gian kết thúc: ${sessionInfo.endTime.toLocaleDateString()}, ${sessionInfo.endTime.toLocaleTimeString()}`}</div>
+          </div>
+        </div>
+
+        <div className="row justify-content-center align-items-center mt-4">
           <div className="col-6 border-end">
             <div className="row justify-content-center align-items-center">
               <div className="col-auto">
@@ -99,7 +109,7 @@ export default function BallotVoter() {
 
             <div className="row justify-content-center align-items-center">
               <div className="col-auto">
-                <button className="btn btn-primary px-4" onClick={handleVote}>
+                <button disabled={isOnTime} className="btn btn-primary px-4" onClick={handleVote}>
                   <PlusCircle />
                   {" Bỏ phiếu "}
                 </button>
@@ -118,13 +128,13 @@ export default function BallotVoter() {
             <div className="row justify-content-center align-items-center mt-4">
               <div className="col-auto">
                 <input type="text" className="form-control" onChange={(event) => setDelegateAddress(event.target.value)} value={delegateAddress} placeholder="0x01234..." />
-                <div className="form-text mb-3">Uỷ quyền.</div>
+                <div className="form-text mb-3">Địa chỉ uỷ quyền.</div>
               </div>
             </div>
 
             <div className="row justify-content-center align-items-center">
               <div className="col-auto">
-                <button className="btn btn-primary px-4" onClick={handleDelegated}>
+                <button disabled={isOnTime} className="btn btn-primary px-4" onClick={handleDelegated}>
                   <ArrowRightCircle />
                   {" Trao quyền bầu cử "}
                 </button>
