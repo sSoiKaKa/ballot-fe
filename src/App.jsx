@@ -1,12 +1,20 @@
-import { DAppProvider, Hardhat } from "@usedapp/core";
+import { DAppProvider, Hardhat, Rinkeby } from "@usedapp/core";
+import { getDefaultProvider } from "ethers";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { AppContextProvider } from "./context/appContext";
 import Navigator from "./Navigator";
 
+// const dappConfig = {
+//   readOnlyChainId: Hardhat.chainId,
+//   readOnlyUrls: {
+//     [Hardhat.chainId]: "http://127.0.0.1:8545/",
+//   },
+// };
+
 const dappConfig = {
-  readOnlyChainId: Hardhat.chainId,
+  readOnlyChainId: Rinkeby.chainId,
   readOnlyUrls: {
-    [Hardhat.chainId]: "http://127.0.0.1:8545/",
+    [Rinkeby.chainId]: getDefaultProvider("rinkeby"),
   },
 };
 
