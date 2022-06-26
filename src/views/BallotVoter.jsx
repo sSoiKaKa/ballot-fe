@@ -1,14 +1,15 @@
 import { useEthers } from "@usedapp/core";
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import ArrowRightCircle from "../components/icons/ArrowRightCircle";
 import PlusCircle from "../components/icons/PlusCircle";
 import useGetCandidatesFromSession from "../hooks/read/useGetCandidatesFromSession";
+import useGetVoterFromSession from "../hooks/read/useGetVoterFromSession";
 import useDelegate from "../hooks/transaction/useDelegate";
 import useVote from "../hooks/transaction/useVote";
-import { getCandidate, getSession } from "../services/store";
+import { getCandidate, getSession, postPersonalRequest } from "../services/store";
 
 export default function BallotVoter() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function BallotVoter() {
 
   const { account } = useEthers();
   const candidatesFromSession = useGetCandidatesFromSession(state.id);
+  const voterFromSession = useGetVoterFromSession(state.id, account);
 
   const [sessionInfo, setSessionInfo] = useState({
     name: "",
@@ -71,6 +73,21 @@ export default function BallotVoter() {
     await delegate.send(ethers.BigNumber.from(state.id), delegateAddress);
   };
 
+  const [personalInfo, setPersonalInfo] = useState({
+    name: "",
+  });
+
+  const handlePersonalRequest = async () => {
+    const id = ethers.BigNumber.from(state.id);
+    const response = await postPersonalRequest(id.toString(), personalInfo.name, account);
+    if (response.status == 200) {
+      Swal.fire({
+        icon: "success",
+        text: "Gửi yêu cầu thành công",
+      });
+    }
+  };
+
   const isOnTime = sessionInfo.startTime <= new Date() && sessionInfo.startTime >= new Date();
 
   return (
@@ -78,11 +95,49 @@ export default function BallotVoter() {
       <div className="col-12">
         <div className="row justify-content-center align-items-center">
           <div className="col-auto">
-            <h2>{sessionInfo.name}</h2>
+            <h2 className="text-center">{sessionInfo.name}</h2>
             <div className="text-center text-secondary">{`Thời gian bắt đầu: ${sessionInfo.startTime.toLocaleDateString()}, ${sessionInfo.startTime.toLocaleTimeString()}`}</div>
             <div className="text-center text-secondary">{`Thời gian kết thúc: ${sessionInfo.endTime.toLocaleDateString()}, ${sessionInfo.endTime.toLocaleTimeString()}`}</div>
           </div>
         </div>
+
+        {voterFromSession?.value[0].weight == 0 ? (
+          <Fragment>
+            <div className="row justify-content-center mt-3">
+              <div className="col-auto">
+                <h5 className="text-center text-danger">Bạn chưa có quyền bầu cử. Hãy gửi yêu cầu để được cấp quyền</h5>
+              </div>
+            </div>
+            <div className="row justify-content-center align-items-center mb-3">
+              <div className="col-auto">
+                <input
+                  type="text"
+                  className="form-control"
+                  onChange={(event) =>
+                    setPersonalInfo({
+                      ...personalInfo,
+                      name: event.target.value,
+                    })
+                  }
+                  value={personalInfo.name}
+                  placeholder="Tên cử tri"
+                />
+              </div>
+              <div className="col-auto">
+                <button className="btn btn-primary px-4" onClick={handlePersonalRequest}>
+                  <ArrowRightCircle />
+                  {" Gửi yêu cầu "}
+                </button>
+              </div>
+            </div>
+          </Fragment>
+        ) : (
+          <div className="row justify-content-center">
+            <div className="col-auto">
+              <h5 className="text-center text-success">Bạn đã có quyền bầu cử. Hãy bắt đầu bỏ phiếu</h5>
+            </div>
+          </div>
+        )}
 
         <div className="row justify-content-center align-items-center mt-4">
           <div className="col-6 border-end">
@@ -127,7 +182,13 @@ export default function BallotVoter() {
 
             <div className="row justify-content-center align-items-center mt-4">
               <div className="col-auto">
-                <input type="text" className="form-control" onChange={(event) => setDelegateAddress(event.target.value)} value={delegateAddress} placeholder="0x01234..." />
+                <input
+                  type="text"
+                  className="form-control"
+                  onChange={(event) => setDelegateAddress(event.target.value)}
+                  value={delegateAddress}
+                  placeholder="0x01234..."
+                />
                 <div className="form-text mb-3">Địa chỉ uỷ quyền.</div>
               </div>
             </div>

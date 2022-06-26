@@ -153,13 +153,21 @@ export default function FindBallotSession() {
         <div className="row justify-content-center align-items-center">
           <div className="col-auto">
             <h2 className="text-secondary text-center">Tìm kiếm cuộc bầu cử bằng ID</h2>
-            <div className="text-secondary text-center">...Đã có {lastSessionId?.value[0].toString()} cuộc bầu cử được tổ chức...</div>
+            <div className="text-secondary text-center">
+              ...Đã có {lastSessionId?.value[0].toString()} cuộc bầu cử được tổ chức...
+            </div>
           </div>
         </div>
 
         <div className="row justify-content-center align-items-center mt-4">
           <div className="col-auto">
-            <input type="number" className="form-control" onChange={handleIdChanged} value={id} placeholder="ID cuộc bầu cử" />
+            <input
+              type="number"
+              className="form-control"
+              onChange={handleIdChanged}
+              value={id}
+              placeholder="ID cuộc bầu cử"
+            />
             <div className="form-text">Bạn cần cung cấp ID cuộc bầu cử để xem nội dung cuộc bầu cử.</div>
           </div>
         </div>
